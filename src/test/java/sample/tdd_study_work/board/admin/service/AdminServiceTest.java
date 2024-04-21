@@ -13,15 +13,15 @@ class AdminServiceTest {
     @Test
     void hashPassword() {
 
-    //given
-    String password = "";
+        //given
+        String password = "";
 
-    //when
-    String hashedPassword = "";
+        //when
+        String hashedPassword = adminService.hashPassword(password);
 
 
-    //then
-    assertThat(password).isNotEqualTo(hashedPassword);
+        //then
+        assertThat(password).isNotEqualTo(hashedPassword);
 
     }
 
@@ -31,7 +31,7 @@ class AdminServiceTest {
 
         //given
         String password = "khm123";
-        String hashedPassword = "khm123";
+        String hashedPassword = adminService.hashPassword(password);
 
         //when
         boolean passwordMatches = adminService.checkPassword(password, hashedPassword);
