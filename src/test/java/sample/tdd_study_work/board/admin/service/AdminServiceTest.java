@@ -1,15 +1,19 @@
 package sample.tdd_study_work.board.admin.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sample.tdd_study_work.board.admin.authority.repository.AdminRepository;
+import sample.tdd_study_work.board.admin.authority.enumeration.BoardAuthorityStatus;
+import sample.tdd_study_work.board.admin.dto.UserCreate;
 import sample.tdd_study_work.board.admin.dto.UserLogin;
+import sample.tdd_study_work.board.admin.dto.UserRead;
+import sample.tdd_study_work.board.admin.dto.UserUpdate;
 import sample.tdd_study_work.board.admin.entity.User;
 import sample.tdd_study_work.board.admin.enumeration.UserAuthorityStatus;
 
-import java.util.Optional;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -97,5 +101,106 @@ class AdminServiceTest {
 
         //then
         assertThat(valid).isTrue();
+    }
+
+    @Test
+    @DisplayName("사용자 목록 확인")
+    void findAllUser() {
+
+        //given
+        List<UserRead> userList = List.of(
+                createData("dr94406@naver.com", "khm"),
+                createData("dr94408@naver.com", "형민이!"));
+
+        //when
+        List<UserRead> allUserList = adminService.findAll();
+
+        //then 쓰레기 코드. 테스트 강의 내용이 기억이 안남 ;; ㅡㅡ;; 앗 ;;
+        assertThat(userList.get(0).name().equals(allUserList.get(0).name()));
+
+    }
+
+    @Test
+    @DisplayName("사용자 생성 시 이미 있는 이메일인지 확인하고 맞다면 뿜 ! ")
+    void createUser() {
+
+        //given
+        UserCreate userCreate = UserCreate
+                .builder()
+                .name("김형민")
+                .email("dr94409@naver.com")
+                .password("rkdcjfdydtkdughdhk!")
+                .build();
+
+        //when //then
+        assertThatThrownBy(() -> adminService.create(userCreate))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("이미 가입된 이메일이 없음!");
+    }
+
+    @Test
+    @DisplayName("사용자 수정")
+    void updateUser() {
+
+        //given
+        UserUpdate userUpdate = UserUpdate
+                .builder()
+                .name("김형민")
+                .email("dr94406@naver.com")
+                .password("rkdcjfdydtkdughdhk!")
+                .build();
+
+        //when //then
+        assertThatThrownBy(() -> adminService.update(userUpdate))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("이미 가입된 이메일입니다.");
+    }
+
+    @Test
+    @DisplayName("사용자 삭제, 존재하지 않는 회원을 삭제하려 하면 뿌밋이 발생한다 뿌밋 ! ")
+    void deleteUser() {
+
+        //given
+        Long id = 1L;
+
+        //when //then
+        assertThatThrownBy(() -> adminService.delete(id))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("존재하지 않는 회원은 삭제할 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("사용자의 비밀번호를 생일로 초기화합니다. 존재하지 않는 회원의 비밀번호를 초기화 하면 뿌밋이 발생한다. 뿌밋! ")
+    void resetUserPassword() {
+
+        //given
+        Long id = 1L;
+
+        //when //then
+        assertThatThrownBy(() -> adminService.reset(id))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("존재하지 않는 회원의 비밀번호는 초기화할 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("사용자에게 권한을 부여합니다. 권한 대상이 없다면 뿌밋이 발생한다 뿌밋!")
+    void updatePermission() {
+
+        //given
+        Long id = 1L;
+
+        //when
+        int value = adminService.updatePermission(id, BoardAuthorityStatus.MOVE);
+
+        //then
+        assertThat(value).isEqualTo(4);
+    }
+
+    private UserRead createData(String email, String name) {
+        return UserRead
+                .builder()
+                .email(email)
+                .name(name)
+                .build();
     }
 }
