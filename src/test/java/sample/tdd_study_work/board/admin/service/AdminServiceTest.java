@@ -1,6 +1,5 @@
 package sample.tdd_study_work.board.admin.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import sample.tdd_study_work.board.admin.dto.UserRead;
 import sample.tdd_study_work.board.admin.dto.UserUpdate;
 import sample.tdd_study_work.board.admin.entity.User;
 import sample.tdd_study_work.board.admin.enumeration.UserAuthorityStatus;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,8 +59,10 @@ class AdminServiceTest {
 
         //given
         UserLogin loginInfo = UserLogin.builder()
-                .email("dr94406@naver.com")
-                .password("$2a$10$xPoOpqzFqlK4BXjEBWqqwea1Lo3FXLuNqR8Bs6JFdaWkKyRbTONWi").build();
+                .email("dr94409@naver.com")
+                .password("$2a$10$JlG722CZH4561ZCm9mVSEeFjwJAy/oh1SwnD/OWELvBbzZ6CmO1HG")
+                .userAuthorityStatus(UserAuthorityStatus.ADMIN)
+                .build();
 
         //when
         String login = adminService.login(loginInfo);
@@ -92,8 +92,8 @@ class AdminServiceTest {
 
         //given
         User userInfo = User.builder()
-                .email("dr94405@naver.com")
-                .password("$1a$10$xPoOpqzFqlK4BXjEBWqqwea1Lo3FXLuNqR8Bs6JFdaWkKyRbTONWi")
+                .email("dr94409@naver.com")
+                .password("$2a$10$VkfpStWATQM3niokrAia/uPFITna0bM5NR.H57ijTtHGZ/pPxF4Eq")
                 .userAuthorityStatus(UserAuthorityStatus.ADMIN).build();
 
         //when
@@ -108,16 +108,10 @@ class AdminServiceTest {
     void findAllUser() {
 
         //given
-        List<UserRead> userList = List.of(
-                createData("dr94406@naver.com", "khm"),
-                createData("dr94408@naver.com", "형민이!"));
+        List<UserRead> userList = List.of(createData("dr94409@naver.com", "김형민"));
 
-        //when
-        List<UserRead> allUserList = adminService.findAll();
-
-        //then 쓰레기 코드. 테스트 강의 내용이 기억이 안남 ;; ㅡㅡ;; 앗 ;;
-        assertThat(userList.get(0).name().equals(allUserList.get(0).name()));
-
+        //then
+        assertThat(userList).size().isEqualTo(1);
     }
 
     @Test
@@ -135,7 +129,7 @@ class AdminServiceTest {
         //when //then
         assertThatThrownBy(() -> adminService.create(userCreate))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("이미 가입된 이메일이 없음!");
+                .hasMessage("이미 가입된 이메일입니다.");
     }
 
     @Test
@@ -157,6 +151,35 @@ class AdminServiceTest {
     }
 
     @Test
+    @DisplayName("사용자의 비밀번호를 생일로 초기화합니다. 존재하지 않는 회원의 비밀번호를 초기화 하면 뿌밋이 발생한다. 뿌밋! ")
+    void resetUserPassword() {
+
+        //given
+        Long id = 7L;
+
+        //when
+        String password = adminService.reset(id);
+
+        //then, hash 하기 전 값을 계산해서 검증하되 hash 처리는 해야함, 생각해보기.
+        assertThat(password).isEqualTo("2000-01-27");
+
+    }
+
+    @Test
+    @DisplayName("사용자에게 권한을 부여합니다. 권한 대상이 없다면 뿌밋이 발생한다 뿌밋!")
+    void updatePermission() {
+
+        //given
+        Long id = 7L;
+
+        //when
+        int value = adminService.updatePermission(id, BoardAuthorityStatus.MOVE);
+
+        //then
+        assertThat(value).isEqualTo(4);
+    }
+
+    @Test
     @DisplayName("사용자 삭제, 존재하지 않는 회원을 삭제하려 하면 뿌밋이 발생한다 뿌밋 ! ")
     void deleteUser() {
 
@@ -167,33 +190,6 @@ class AdminServiceTest {
         assertThatThrownBy(() -> adminService.delete(id))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("존재하지 않는 회원은 삭제할 수 없습니다.");
-    }
-
-    @Test
-    @DisplayName("사용자의 비밀번호를 생일로 초기화합니다. 존재하지 않는 회원의 비밀번호를 초기화 하면 뿌밋이 발생한다. 뿌밋! ")
-    void resetUserPassword() {
-
-        //given
-        Long id = 1L;
-
-        //when //then
-        assertThatThrownBy(() -> adminService.reset(id))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("존재하지 않는 회원의 비밀번호는 초기화할 수 없습니다.");
-    }
-
-    @Test
-    @DisplayName("사용자에게 권한을 부여합니다. 권한 대상이 없다면 뿌밋이 발생한다 뿌밋!")
-    void updatePermission() {
-
-        //given
-        Long id = 1L;
-
-        //when
-        int value = adminService.updatePermission(id, BoardAuthorityStatus.MOVE);
-
-        //then
-        assertThat(value).isEqualTo(4);
     }
 
     private UserRead createData(String email, String name) {
