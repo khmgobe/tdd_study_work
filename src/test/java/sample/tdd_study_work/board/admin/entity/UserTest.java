@@ -24,7 +24,7 @@ class UserTest {
                 .password("1234")
                 .birthDay(LocalDate.now())
                 .email("dr94406@naver.com")
-                .userAuthorityStatus(UserAuthorityStatus.USER)
+                .userAuthorityStatus(UserAuthorityStatus.ADMIN)
                 .build();
 
     //when
@@ -44,7 +44,7 @@ class UserTest {
                 .name("khm")
                 .password("1234")
                 .birthDay(LocalDate.now())
-                .email(null)
+                .email("dr94406")
                 .userAuthorityStatus(UserAuthorityStatus.ADMIN)
                 .build();
 
