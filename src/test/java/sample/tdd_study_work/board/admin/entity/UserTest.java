@@ -17,7 +17,7 @@ class UserTest {
     @DisplayName("관리자인지 확인한다.")
     void CheckAdmin() {
 
-    //given
+        //given
         User user = User.builder()
                 .id(999L)
                 .name("khm")
@@ -27,10 +27,10 @@ class UserTest {
                 .userAuthorityStatus(UserAuthorityStatus.ADMIN)
                 .build();
 
-    //when
+        //when
         boolean result = user.isAdmin();
 
-    //then
+        //then
         assertThat(result).isTrue();
     }
 
