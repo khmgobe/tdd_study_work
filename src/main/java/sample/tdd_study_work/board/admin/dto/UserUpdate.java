@@ -1,8 +1,14 @@
 package sample.tdd_study_work.board.admin.dto;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import lombok.Builder;
 
-public record UserUpdate(String name, String password, LocalDate birthDay, String email) {
+public record UserUpdate (String email, String name, String password) {
 
+
+    @Builder
+    public UserUpdate(String email, String name, String password) {
+        this.name = name;
+        this.password = password;
+        this.email = email;
+    }
 }
